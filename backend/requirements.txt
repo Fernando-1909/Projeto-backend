@@ -2,3 +2,4 @@ Flask
 Flask-SQLAlchemy
 Flask-Cors
 mysql-connector-python
+PyJWT>=2.0

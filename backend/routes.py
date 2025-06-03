@@ -1,7 +1,13 @@
 from flask import Blueprint, request, jsonify
-from models import db, Professor, ProjetoEnsino, ProjetoPesquisa, ProjetoExtensao, Evento, Mensagem, Inscricao
+from models import db, Professor, ProjetoEnsino, ProjetoPesquisa, ProjetoExtensao, Evento, Mensagem, Inscricao, Publicacao, Orientacao
+from flask import Blueprint, jsonify, request
+from models import db, Professor, AreaPesquisa
+import jwt
+from datetime import datetime, timedelta
 
 bp = Blueprint('routes', __name__)
+
+SECRET_KEY = 'senha123' # Mudar para algo mais seguro, botei assim pra ficar fácil pra mim :)
 
 # Dicionário para mapear o tipo de projeto ao modelo correspondente
 projeto_modelos = {
@@ -9,27 +15,6 @@ projeto_modelos = {
     'pesquisa': ProjetoPesquisa,
     'extensao': ProjetoExtensao
 }
-
-# Criar professor
-@bp.route('/professores', methods=['POST'])
-def criar_professor():
-    data = request.json
-    nome = data.get('nome')
-    if not nome:
-        return jsonify({'error': 'Nome do professor é obrigatório'}), 400
-
-    professor = Professor(nome=nome)
-    db.session.add(professor)
-    db.session.commit()
-
-    return jsonify({'id': professor.id, 'nome': professor.nome}), 201
-
-# Listar todos professores
-@bp.route('/professores', methods=['GET'])
-def listar_professores():
-    professores = Professor.query.all()
-    resultado = [{'id': p.id, 'nome': p.nome} for p in professores]
-    return jsonify(resultado), 200
 
 # Criar projeto (ensino, pesquisa ou extensão)
 @bp.route('/projetos/<tipo>', methods=['POST'])
@@ -159,3 +144,77 @@ def inscrever_evento():
     db.session.add(insc)
     db.session.commit()
     return jsonify({'mensagem': 'Inscrição realizada com sucesso!'})
+
+
+@bp.route('/api/professor', methods=['GET'])
+def get_professor():
+    professor = Professor.query.first()
+    if not professor:
+        return jsonify({'mensagem': 'Professor não encontrado'}), 404
+
+    return jsonify({
+        'id': professor.id,
+        'nome': professor.nome,
+        'titulacao': professor.titulacao,
+        'email': professor.email,
+        'lattes': professor.lattes,
+        'orcid': professor.orcid,
+        'bio': professor.bio,
+        'foto': professor.foto
+    })
+
+@bp.route('/api/areas', methods=['GET'])
+def get_areas():
+    areas = AreaPesquisa.query.all()
+    return jsonify([{
+        'id': area.id,
+        'nome': area.nome,
+        'descricao': area.descricao,
+        'professor_id': area.professor_id
+    } for area in areas])
+
+@bp.route('/api/auth/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    senha = data.get('senha')
+
+    professor = Professor.query.filter_by(email=email).first()
+    if professor and professor.verificar_senha(senha):
+        token = jwt.encode({
+            'user_id': professor.id,
+            'exp': datetime.utcnow() + timedelta(hours=2)
+        }, SECRET_KEY, algorithm='HS256')
+
+        return jsonify({
+            'token': token,
+            'expiresIn': '2h'
+        })
+
+    return jsonify({'mensagem': 'Credenciais inválidas'}), 401
+
+@bp.route('/api/publicacoes', methods=['GET'])
+def listar_publicacoes():
+    publicacoes = Publicacao.query.all()
+    return jsonify([{
+        'id': p.id,
+        'titulo': p.titulo,
+        'ano': p.ano,
+        'tipo': p.tipo,
+        'link': p.link,
+        'professor_id': p.professor_id,
+        'professor_nome': p.professor.nome
+    } for p in publicacoes]), 200
+
+
+@bp.route('/api/orientacoes', methods=['GET'])
+def listar_orientacoes():
+    orientacoes = Orientacao.query.all()
+    return jsonify([{
+        'id': o.id,
+        'nome_orientando': o.nome_orientando,
+        'nivel': o.nivel,
+        'tema': o.tema,
+        'professor_id': o.professor_id,
+        'professor_nome': o.professor.nome
+    } for o in orientacoes]), 200
