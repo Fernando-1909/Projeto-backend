@@ -5,7 +5,7 @@ db = SQLAlchemy()
 
 # Tabela de associação entre Projeto e Área de Pesquisa (N:N)
 projeto_area = db.Table('projeto_area',
-    db.Column('area_id', db.Integer, db.ForeignKey('area_pesquisa.id'), primary_key=True),
+    db.Column('area_id', db.Integer, db.ForeignKey('areas_pesquisaquisa.id'), primary_key=True),
     db.Column('projeto_id', db.Integer, nullable=False),
     db.Column('tipo', db.String(20), nullable=False),  # 'ensino', 'pesquisa', 'extensao'
 )
@@ -24,12 +24,12 @@ class Professor(db.Model):
     data_atualizacao = db.Column(db.DateTime)
 
     # Relacionamentos
-    areas = db.relationship('AreasPesquisa', backref='professor', lazy=True)
-    publicacoes = db.relationship('Publicacao', backref='professor', lazy=True)
-    orientacoes = db.relationship('Orientacao', backref='professor', lazy=True)
-    projetos_ensino = db.relationship('ProjetoEnsino', backref='professor', lazy=True)
-    projetos_pesquisa = db.relationship('ProjetoPesquisa', backref='professor', lazy=True)
-    projetos_extensao = db.relationship('ProjetoExtensao', backref='professor', lazy=True)
+    areas = db.relationship('AreasPesquisa', backref='professores', lazy=True)
+    publicacoes = db.relationship('Publicacao', backref='professores', lazy=True)
+    orientacoes = db.relationship('Orientacao', backref='professores', lazy=True)
+    projetos_ensino = db.relationship('ProjetoEnsino', backref='professores', lazy=True)
+    projetos_pesquisa = db.relationship('ProjetoPesquisa', backref='professores', lazy=True)
+    projetos_extensao = db.relationship('ProjetoExtensao', backref='professores', lazy=True)
 
     def set_senha(self, senha):
         self.senha_hash = generate_password_hash(senha)
@@ -39,11 +39,11 @@ class Professor(db.Model):
 
 
 class AreaPesquisa(db.Model):
-    __tablename__ = 'area_pesquisa'
+    __tablename__ = 'areas_pesquisa'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.Text)
-    professor_id = db.Column(db.Integer, db.ForeignKey('professor.id'), nullable=False)
+    professores_id = db.Column(db.Integer, db.ForeignKey('professores.id'), nullable=False)
 
 
 class Publicacao(db.Model):
@@ -53,7 +53,7 @@ class Publicacao(db.Model):
     ano = db.Column(db.Integer, nullable=False)
     tipo = db.Column(db.String(50))
     link = db.Column(db.String(255))
-    professor_id = db.Column(db.Integer, db.ForeignKey('professor.id'), nullable=False)
+    professores_id = db.Column(db.Integer, db.ForeignKey('professores.id'), nullable=False)
 
 
 class Orientacao(db.Model):
@@ -62,7 +62,7 @@ class Orientacao(db.Model):
     nome_orientando = db.Column(db.String(255), nullable=False)
     nivel = db.Column(db.String(50))
     tema = db.Column(db.Text)
-    professor_id = db.Column(db.Integer, db.ForeignKey('professor.id'), nullable=False)
+    professores_id = db.Column(db.Integer, db.ForeignKey('professores.id'), nullable=False)
 
 
 # Modelos dos projetos
@@ -73,7 +73,7 @@ class ProjetoBase:
     descricao = db.Column(db.Text, nullable=False)
     categoria = db.Column(db.String(255), nullable=False)
     foto_path = db.Column(db.String(255))
-    professor_id = db.Column(db.Integer, db.ForeignKey('professor.id'), nullable=False)
+    professores_id = db.Column(db.Integer, db.ForeignKey('professores.id'), nullable=False)
 
 
 class ProjetoEnsino(db.Model, ProjetoBase):
@@ -108,7 +108,7 @@ class Evento(db.Model):
     data = db.Column(db.Date)
     hora = db.Column(db.Time)
     local = db.Column(db.String(255))
-    professor_id = db.Column(db.Integer, db.ForeignKey('professor.id'))
+    professores_id = db.Column(db.Integer, db.ForeignKey('professores.id'))
 
 
 class Mensagem(db.Model):
@@ -117,7 +117,7 @@ class Mensagem(db.Model):
     nome = db.Column(db.String(255))
     email = db.Column(db.String(255))
     mensagem = db.Column(db.Text)
-    professor_id = db.Column(db.Integer, db.ForeignKey('professor.id'))
+    professores_id = db.Column(db.Integer, db.ForeignKey('professores.id'))
 
 
 class Inscricao(db.Model):
