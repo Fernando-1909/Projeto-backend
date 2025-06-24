@@ -1,0 +1,62 @@
+.card {
+  width: 300px;
+  min-height: 380px;
+  background-color: white;
+  padding: 1.8rem 1.2rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+}
+
+.imagemPlaceholder {
+  width: 100px;
+  height: 100px;
+  background-color: #e4e6f1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.icone {
+  font-size: 2.5rem;
+  color: #1f2a68;
+}
+
+.orientadoresPage {
+  background-color: #f8f9ff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+}
+
+.titulo {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.cardContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.orientadoresPage {
+  min-height: calc(100vh - 80px); /* 80px = altura aproximada do footer + navbar */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
