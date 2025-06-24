@@ -6,6 +6,7 @@ Este é um site desenvolvido em React + Vite + CSS Modules para listar projetos,
 
 ```bash
 git clone https://github.com/Fernando-1909/Projeto-dev-sites-UERN/
-cd seu-repo
+cd seurepositorio
+cd frontend
 npm install
 npm run dev
