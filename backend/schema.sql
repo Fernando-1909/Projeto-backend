@@ -17,6 +17,16 @@ CREATE TABLE professores (
     data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+-- Tabela de Alunos (usada para validar matrícula)
+DROP TABLE IF EXISTS alunos;
+CREATE TABLE alunos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100),
+    matricula VARCHAR(20) NOT NULL UNIQUE,
+    curso VARCHAR(100)
+);
+
 -- Tabela de Áreas de Pesquisa (1:N com professores)
 DROP TABLE IF EXISTS areas_pesquisa;
 CREATE TABLE areas_pesquisa (
@@ -34,10 +44,10 @@ CREATE TABLE projeto_area (
     area_id INT NOT NULL,
     tipo VARCHAR(20) NOT NULL, -- 'ensino', 'pesquisa', 'extensao'
     PRIMARY KEY (projeto_id, area_id, tipo)
-    -- As FKs são definidas em triggers ou pela aplicação devido ao campo "tipo" que referencia três tabelas diferentes
+    -- As FKs são definidas em triggers ou pela aplicação devido ao campo "tipo"
 );
 
--- Tabela de Publicações (1:N com professores)
+-- Publicações
 DROP TABLE IF EXISTS publicacoes;
 CREATE TABLE publicacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -49,7 +59,7 @@ CREATE TABLE publicacoes (
     FOREIGN KEY (professor_id) REFERENCES professores(id) ON DELETE CASCADE
 );
 
--- Tabela de Orientações (1:N com professores)
+-- Orientações
 DROP TABLE IF EXISTS orientacoes;
 CREATE TABLE orientacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -60,8 +70,7 @@ CREATE TABLE orientacoes (
     FOREIGN KEY (professor_id) REFERENCES professores(id) ON DELETE CASCADE
 );
 
--- Tabelas de Projetos
-
+-- Projetos (ensino, pesquisa, extensão)
 DROP TABLE IF EXISTS projetos_ensino;
 CREATE TABLE projetos_ensino (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -95,7 +104,7 @@ CREATE TABLE projetos_extensao (
     FOREIGN KEY (professor_id) REFERENCES professores(id) ON DELETE CASCADE
 );
 
--- Eventos (Palestras e Oficinas)
+-- Eventos
 DROP TABLE IF EXISTS eventos;
 CREATE TABLE eventos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -119,12 +128,29 @@ CREATE TABLE mensagens (
     FOREIGN KEY (professor_id) REFERENCES professores(id) ON DELETE SET NULL
 );
 
--- Inscrições em Eventos
+-- Inscrições em Eventos (agora com matrícula obrigatória)
 DROP TABLE IF EXISTS inscricoes;
 CREATE TABLE inscricoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome_participante VARCHAR(255),
     email VARCHAR(255),
+    matricula VARCHAR(20) NOT NULL,
+    curso VARCHAR(100),
     evento_id INT,
-    FOREIGN KEY (evento_id) REFERENCES eventos(id) ON DELETE CASCADE
+    FOREIGN KEY (evento_id) REFERENCES eventos(id) ON DELETE CASCADE,
+    FOREIGN KEY (matricula) REFERENCES alunos(matricula) ON DELETE RESTRICT
+);
+
+-- Inscrições em Projetos (nova tabela separada)
+DROP TABLE IF EXISTS inscricoes_projetos;
+CREATE TABLE inscricoes_projetos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome_participante VARCHAR(255),
+    email VARCHAR(255),
+    matricula VARCHAR(20) NOT NULL,
+    curso VARCHAR(100),
+    tipo_projeto VARCHAR(20) NOT NULL, -- ensino, pesquisa, extensao
+    projeto_id INT NOT NULL,
+    FOREIGN KEY (matricula) REFERENCES alunos(matricula) ON DELETE RESTRICT
+    -- FK do projeto será verificada na aplicação devido ao campo tipo_projeto
 );
