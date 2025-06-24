@@ -5,7 +5,7 @@ Este é um site desenvolvido em React + Vite + CSS Modules para listar projetos,
 ## 🚀 Instalação
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repo.git
+git clone https://github.com/Fernando-1909/Projeto-dev-sites-UERN/
 cd seu-repo
 npm install
 npm run dev
