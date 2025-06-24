@@ -9,4 +9,5 @@ git clone https://github.com/Fernando-1909/Projeto-dev-sites-UERN/
 cd seurepositorio
 cd frontend
 npm install
+npm install vite --save-dev
 npm run dev
