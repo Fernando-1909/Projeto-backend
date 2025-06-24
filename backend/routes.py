@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import db, Professor, ProjetoEnsino, ProjetoPesquisa, ProjetoExtensao, Evento, Mensagem, Inscricao, Publicacao, Orientacao
+from models import db, Professor, ProjetoEnsino, ProjetoPesquisa, ProjetoExtensao, Evento, Mensagem, Aluno, InscricaoEvento, InscricaoProjeto, Publicacao, Orientacao
 from flask import Blueprint, jsonify, request
 from models import db, Professor, AreaPesquisa
 import jwt
@@ -133,17 +133,60 @@ def enviar_mensagem():
     return jsonify({'mensagem': 'Contato enviado com sucesso!'})
 
 # Inscrição em evento
-@bp.route('/api/inscricoes', methods=['POST'])
-def inscrever_evento():
-    data = request.json
-    insc = Inscricao(
-        nome_participante=data['nome_participante'],
-        email=data['email'],
-        evento_id=data['evento_id']
+@bp.route('/api/inscrever-evento', methods=['POST'])
+def inscrever_evento_novo():
+    matricula = request.form.get('matricula')
+    evento_id = request.form.get('evento_id')
+
+    aluno = Aluno.query.filter_by(matricula=matricula).first()
+    if not aluno:
+        return jsonify({'erro': 'Matrícula não encontrada'}), 400
+
+    # Verifica se o evento existe
+    evento = Evento.query.get(evento_id)
+    if not evento:
+        return jsonify({'erro': 'Evento não encontrado'}), 404
+
+    inscricao = InscricaoEvento(
+        aluno_id=aluno.id,
+        evento_id=evento_id
     )
-    db.session.add(insc)
+    db.session.add(inscricao)
     db.session.commit()
-    return jsonify({'mensagem': 'Inscrição realizada com sucesso!'})
+
+    return jsonify({'mensagem': 'Inscrição em evento realizada com sucesso!'}), 201
+
+
+# ✅ Inscrição em projeto
+@bp.route('/api/inscrever-projeto', methods=['POST'])
+def inscrever_projeto():
+    matricula = request.form.get('matricula')
+    projeto_id = request.form.get('projeto_id')
+    tipo_projeto = request.form.get('tipo_projeto')  # ensino, pesquisa ou extensao
+
+    aluno = Aluno.query.filter_by(matricula=matricula).first()
+    if not aluno:
+        return jsonify({'erro': 'Matrícula não encontrada'}), 400
+
+    # Verifica se o projeto existe
+    Model = projeto_modelos.get(tipo_projeto)
+    if not Model:
+        return jsonify({'erro': 'Tipo de projeto inválido'}), 400
+
+    projeto = Model.query.get(projeto_id)
+    if not projeto:
+        return jsonify({'erro': 'Projeto não encontrado'}), 404
+
+    inscricao = InscricaoProjeto(
+        aluno_id=aluno.id,
+        projeto_id=projeto_id,
+        tipo_projeto=tipo_projeto
+    )
+    db.session.add(inscricao)
+    db.session.commit()
+
+    return jsonify({'mensagem': 'Inscrição em projeto realizada com sucesso!'}), 201
+
 
 
 @bp.route('/api/professor', methods=['GET'])
