@@ -1,34 +1,39 @@
-// src/pages/Palestras.jsx
-import styles from '../styles/EventosCard.module.css';
-import PalestraCard from '../components/EventosCard';
+import { useEffect, useState } from 'react';
+import EventosCard from "../components/EventosCard"; 
+import styles from "../components/Eventos.module.css";
 
-function Palestras() {
-  const palestras = [
-    {
-      titulo: "Oficina de Iniciação Científica",
-      descricao: "Aprenda os primeiros passos para desenvolver pesquisa científica.",
-      data: "25/07/2025",
-      local: "Auditório Central",
-    },
-    {
-      titulo: "Palestra sobre Extensão Universitária",
-      descricao: "Importância da extensão e seu impacto na comunidade.",
-      data: "28/07/2025",
-      local: "Bloco D, Sala 204",
-    },
-    // Adicione mais itens aqui
-  ];
+function Eventos() {
+  const [eventos, setEventos] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/eventos')
+      .then(res => res.json())
+      .then(data => setEventos(data))
+      .catch(err => console.error('Erro ao buscar eventos:', err));
+  }, []);
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.titulo}>Palestras e Oficinas</h1>
-      <div className={styles.lista}>
-        {palestras.map((p, index) => (
-          <PalestraCard key={index} {...p} />
-        ))}
+    <section className={styles.section}>
+      <h2>Eventos e Oficinas</h2>
+      <p>Fique por dentro das próximas palestras e oficinas que a UERN está promovendo!</p>
+
+      <div className={styles.grid}>
+        {eventos.length > 0 ? (
+          eventos.map((evento, index) => (
+            <EventosCard
+              key={index}
+              titulo={evento.titulo}
+              descricao={evento.descricao}
+              data={evento.data}
+              local={evento.local}
+            />
+          ))
+        ) : (
+          <p>Carregando eventos...</p>
+        )}
       </div>
-    </div>
+    </section>
   );
 }
 
-export default Palestras;
+export default Eventos;

@@ -9,6 +9,9 @@ import ProjetoDetalhado from './pages/ProjetoDetalhado';
 import Orientadores from './pages/Orientadores';
 import Eventos from './pages/Eventos';
 import Formulario from './pages/Formulario';
+import CadastroAluno from './components/CadastroAluno';
+import CadastroProjeto from './components/CadastroProjeto';
+import CadastroProfessor from './components/CadastroProfessor';
 
 function App() {
   return (
@@ -21,6 +24,9 @@ function App() {
         <Route path="/orientadores" element={<Orientadores />} />
         <Route path="/eventos" element={<Eventos />} />
         <Route path="/inscricao" element={<Formulario />} />
+        <Route path="/cadastro-aluno" element={<CadastroAluno />} />
+        <Route path="/cadastro-projeto" element={<CadastroProjeto />} />
+        <Route path="/cadastro-professor" element={<CadastroProfessor />} />
       </Routes>
       <Footer />
     </Router>

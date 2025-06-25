@@ -1,31 +1,59 @@
-// pages/Projetos.jsx
-import styles from '../styles/Projetos.module.css';
-import ProjetoCard from '../components/ProjetoCard';
-
-const projetos = [
-  {
-    id: 1,
-    titulo: "Projeto de Robótica Educacional",
-    tipo: "Extensão",
-    descricao: "Envolve alunos na criação de soluções robóticas para escolas públicas.",
-  },
-  {
-    id: 2,
-    titulo: "Pesquisa em Biotecnologia",
-    tipo: "Pesquisa",
-    descricao: "Estudos aplicados à saúde e à agricultura.",
-  },
-];
+import { useState, useEffect } from 'react';
+import '../components/Projetos.css';
 
 function Projetos() {
+  const [ensino, setEnsino] = useState([]);
+  const [pesquisa, setPesquisa] = useState([]);
+  const [extensao, setExtensao] = useState([]);
+  const [erro, setErro] = useState('');
+
+  const carregarProjetos = async () => {
+    try {
+      const tipos = ['ensino', 'pesquisa', 'extensao'];
+
+      for (const tipo of tipos) {
+        const res = await fetch(`http://localhost:8080/projetos/${tipo}`);
+        const data = await res.json();
+        if (tipo === 'ensino') setEnsino(data);
+        if (tipo === 'pesquisa') setPesquisa(data);
+        if (tipo === 'extensao') setExtensao(data);
+      }
+    } catch (err) {
+      console.error('Erro ao buscar projetos:', err);
+      setErro('Erro ao carregar projetos');
+    }
+  };
+
+  useEffect(() => {
+    carregarProjetos();
+  }, []);
+
+  const renderCards = (projetos) => (
+    <div className="projetos-grid">
+      {projetos.map(proj => (
+        <div key={proj.id} className="card-projeto">
+          <img src={proj.foto_path || 'https://via.placeholder.com/150'} alt="Capa do projeto" />
+          <h3>{proj.titulo}</h3>
+          <p><strong>Categoria:</strong> {proj.categoria}</p>
+          <p>{proj.descricao}</p>
+          <p><strong>Orientador:</strong> {proj.professor_nome || 'Desconhecido'}</p>
+        </div>
+      ))}
+    </div>
+  );
+
   return (
-    <div className={styles.projetosPage}>
-      <h1>Projetos</h1>
-      <div className={styles.lista}>
-        {projetos.map((projeto) => (
-          <ProjetoCard key={projeto.id} projeto={projeto} />
-        ))}
-      </div>
+    <div className="pagina-projetos">
+      <h2>Projetos de Ensino</h2>
+      {renderCards(ensino)}
+
+      <h2>Projetos de Pesquisa</h2>
+      {renderCards(pesquisa)}
+
+      <h2>Projetos de Extensão</h2>
+      {renderCards(extensao)}
+
+      {erro && <p style={{ color: 'red' }}>{erro}</p>}
     </div>
   );
 }
