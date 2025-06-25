@@ -20,7 +20,7 @@ class Professor(db.Model):
     orcid = db.Column(db.String(50))
     bio = db.Column(db.Text)
     foto = db.Column(db.String(255))
-    senha_hash = db.Column(db.String(128))
+    senha_hash = db.Column(db.String(512))
     data_atualizacao = db.Column(db.DateTime)
 
     # Relacionamentos
@@ -81,6 +81,7 @@ class ProjetoBase(db.Model):
 
 class ProjetoEnsino(ProjetoBase):
     __tablename__ = 'projetos_ensino'
+    professor = db.relationship('Professor', backref='projetos_ensino')
     areas = db.relationship('AreaPesquisa', secondary=projeto_area,
                             primaryjoin="and_(ProjetoEnsino.id==projeto_area.c.projeto_id, projeto_area.c.tipo=='ensino')",
                             secondaryjoin="AreaPesquisa.id==projeto_area.c.area_id",
@@ -88,6 +89,7 @@ class ProjetoEnsino(ProjetoBase):
 
 class ProjetoPesquisa(ProjetoBase):
     __tablename__ = 'projetos_pesquisa'
+    professor = db.relationship('Professor', backref='projetos_pesquisa')
     areas = db.relationship('AreaPesquisa', secondary=projeto_area,
                             primaryjoin="and_(ProjetoPesquisa.id==projeto_area.c.projeto_id, projeto_area.c.tipo=='pesquisa')",
                             secondaryjoin="AreaPesquisa.id==projeto_area.c.area_id",
@@ -95,6 +97,7 @@ class ProjetoPesquisa(ProjetoBase):
 
 class ProjetoExtensao(ProjetoBase):
     __tablename__ = 'projetos_extensao'
+    professor = db.relationship('Professor', backref='projetos_extensao')
     areas = db.relationship('AreaPesquisa', secondary=projeto_area,
                             primaryjoin="and_(ProjetoExtensao.id==projeto_area.c.projeto_id, projeto_area.c.tipo=='extensao')",
                             secondaryjoin="AreaPesquisa.id==projeto_area.c.area_id",
@@ -110,7 +113,7 @@ class Evento(db.Model):
     local = db.Column(db.String(255))
     professor_id = db.Column(db.Integer, db.ForeignKey('professores.id'))
 
-    inscricoes = db.relationship('Inscricao', backref='evento', lazy=True)
+    inscricoes = db.relationship('InscricaoEvento', backref='evento', lazy=True)
 
 class Mensagem(db.Model):
     __tablename__ = 'mensagens'

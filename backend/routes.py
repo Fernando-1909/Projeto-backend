@@ -261,3 +261,58 @@ def listar_orientacoes():
         'professor_id': o.professor_id,
         'professor_nome': o.professor.nome
     } for o in orientacoes]), 200
+
+@bp.route('/api/alunos', methods=['POST'])
+def criar_aluno():
+    data = request.get_json()
+    nome = data.get('nome')
+    email = data.get('email')
+    curso = data.get('curso')
+    matricula = data.get('matricula')
+
+    if not nome or not matricula:
+        return jsonify({'erro': 'Nome e matrícula são obrigatórios'}), 400
+
+    # Verificar se já existe aluno com essa matrícula
+    if Aluno.query.filter_by(matricula=matricula).first():
+        return jsonify({'erro': 'Matrícula já cadastrada'}), 400
+
+    novo_aluno = Aluno(nome=nome,email=email,curso=curso, matricula=matricula)
+    db.session.add(novo_aluno)
+    db.session.commit()
+
+    return jsonify({'mensagem': 'Aluno cadastrado com sucesso'}), 201
+
+@bp.route('/api/professores', methods=['POST'])
+def cadastrar_professor():
+    data = request.get_json()
+
+    nome = data.get('nome')
+    titulacao = data.get('titulacao')
+    email = data.get('email')
+    lattes = data.get('lattes')
+    orcid = data.get('orcid')
+    bio = data.get('bio')
+    senha = data.get('senha')
+    foto = data.get('foto')
+
+    if not all([nome, titulacao, email, senha]):
+        return jsonify({'erro': 'Campos obrigatórios ausentes'}), 400
+
+    if Professor.query.filter_by(email=email).first():
+        return jsonify({'erro': 'Email já cadastrado'}), 409
+
+    professor = Professor(
+        nome=nome,
+        titulacao=titulacao,
+        email=email,
+        lattes=lattes,
+        orcid=orcid,
+        bio=bio,
+        foto=foto
+    )
+    professor.set_senha(senha)
+    db.session.add(professor)
+    db.session.commit()
+
+    return jsonify({'mensagem': 'Professor cadastrado com sucesso'}), 201
