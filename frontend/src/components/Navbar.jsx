@@ -12,7 +12,7 @@ function Navbar() {
       <div className={styles.menu}>
         <Link to="/orientadores"><button>ORIENTADORES</button></Link>
         <Link to="/projetos"><button>PROJETOS</button></Link>
-        <Link to="/eventos"><button>PALESTRAS E OFICINAS</button></Link>
+        <Link to="/eventos"><button>EVENTOS</button></Link>
         <Link to="/inscricao"><button>INSCREVA-SE</button></Link>
         <Link to="/cadastro-aluno"><button>CADASTRAR ALUNO</button></Link>
         <Link to="/cadastro-projeto"><button>CADASTRAR PROJETO</button></Link>
