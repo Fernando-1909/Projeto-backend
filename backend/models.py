@@ -16,22 +16,13 @@ class Professor(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     titulacao = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
-    lattes = db.Column(db.String(255))
-    orcid = db.Column(db.String(50))
+    lattes = db.Column(db.String(512))
+    orcid = db.Column(db.String(512))
     bio = db.Column(db.Text)
     foto = db.Column(db.String(255))
     senha_hash = db.Column(db.String(512))
     data_atualizacao = db.Column(db.DateTime)
 
-    # Relacionamentos
-    areas = db.relationship('AreaPesquisa', backref='professor', lazy=True)
-    publicacoes = db.relationship('Publicacao', backref='professor', lazy=True)
-    orientacoes = db.relationship('Orientacao', backref='professor', lazy=True)
-    projetos_ensino = db.relationship('ProjetoEnsino', backref='professor_ensino', lazy=True)
-    projetos_pesquisa = db.relationship('ProjetoPesquisa', backref='professor_pesquisa', lazy=True)
-    projetos_extensao = db.relationship('ProjetoExtensao', backref='professor_extensao', lazy=True)
-    eventos = db.relationship('Evento', backref='professor', lazy=True)
-    mensagens = db.relationship('Mensagem', backref='professor', lazy=True)
 
     def set_senha(self, senha):
         self.senha_hash = generate_password_hash(senha)
